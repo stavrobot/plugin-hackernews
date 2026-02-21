@@ -1,0 +1,11 @@
+{
+  "name": "get_front_page",
+  "description": "Fetch the top stories from the Hacker News front page. Returns title, URL, author, score, comment count, and timestamp for each story.",
+  "entrypoint": "run.py",
+  "parameters": {
+    "limit": {
+      "type": "integer",
+      "description": "Number of stories to fetch (1-500). Defaults to 30."
+    }
+  }
+}

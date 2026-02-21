@@ -1,0 +1,4 @@
+{
+  "name": "hackernews",
+  "description": "Fetch stories and data from Hacker News using the official API."
+}
