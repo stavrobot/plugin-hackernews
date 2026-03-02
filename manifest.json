@@ -1,6 +1,6 @@
 {
   "name": "hackernews",
-  "description": "Fetch stories and data from Hacker News using the official API.",
+  "description": "Fetch stories and data from Hacker News using the official API. Can also analyze a user's comment history using an LLM to answer questions about them.",
   "config": {
     "api_key": {
       "description": "OpenAI API key for LLM-based analysis tools.",
