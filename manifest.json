@@ -1,4 +1,15 @@
 {
   "name": "hackernews",
-  "description": "Fetch stories and data from Hacker News using the official API."
+  "description": "Fetch stories and data from Hacker News using the official API.",
+  "config": {
+    "api_key": {
+      "description": "OpenAI API key for LLM-based analysis tools.",
+      "required": true
+    },
+    "model": {
+      "description": "OpenAI model to use for analysis.",
+      "required": false,
+      "default": "gpt-5.2"
+    }
+  }
 }

@@ -1,0 +1,16 @@
+{
+  "name": "stalk",
+  "description": "Analyze a Hacker News user's comment history using an LLM to answer a question about them.",
+  "entrypoint": "run.py",
+  "async": true,
+  "parameters": {
+    "username": {
+      "type": "string",
+      "description": "The Hacker News username to analyze."
+    },
+    "question": {
+      "type": "string",
+      "description": "The question to answer about the user based on their comment history."
+    }
+  }
+}
