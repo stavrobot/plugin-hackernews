@@ -1,0 +1,19 @@
+{
+  "name": "submit_story",
+  "description": "Submit a story (link or text post) to Hacker News on behalf of the configured user.",
+  "entrypoint": "run.py",
+  "parameters": {
+    "title": {
+      "type": "string",
+      "description": "The title of the story to submit."
+    },
+    "url": {
+      "type": "string",
+      "description": "The URL to submit (optional if 'text' is provided)."
+    },
+    "text": {
+      "type": "string",
+      "description": "The body text for a text post (optional if 'url' is provided). Can be combined with a URL."
+    }
+  }
+}

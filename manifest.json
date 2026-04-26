@@ -10,6 +10,10 @@
       "description": "OpenAI model to use for analysis.",
       "required": false,
       "default": "gpt-5.2"
+    },
+    "cookie": {
+      "description": "Value of the HN 'user' cookie from your browser (DevTools → Application → Cookies → news.ycombinator.com → user). Required only for the submit_story tool.",
+      "required": false
     }
   }
 }
