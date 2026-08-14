@@ -26,6 +26,7 @@ Analyze a Hacker News user's comment history with OpenAI to answer a question ab
 
 - `username` (string, required): The Hacker News username to analyze.
 - `question` (string, required): The question to answer about the user.
+- `max_comments` (integer, optional): Maximum number of comments to analyze (1–2000). Defaults to 600.
 
 ### `submit_story`
 

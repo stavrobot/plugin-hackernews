@@ -12,10 +12,9 @@ import requests
 from openai import OpenAI
 
 BASE_URL = "https://hacker-news.firebaseio.com/v0"
-MAX_COMMENTS = 600
-MAX_WORKERS = 5
+MAX_WORKERS = 10
 
-KNOWN_PARAMS = {"username", "question"}
+KNOWN_PARAMS = {"username", "question", "max_comments"}
 
 
 def fetch_item(item_id: int) -> dict | None:
@@ -24,22 +23,33 @@ def fetch_item(item_id: int) -> dict | None:
     return response.json()
 
 
-def fetch_comments(submitted: list[int]) -> list[str]:
+def fetch_comments(submitted: list[int], max_comments: int) -> list[str]:
     # Submit IDs in batches so we stop making HTTP requests once we have enough
     # comments. Submitting all IDs upfront would trigger one request per
-    # submission even for users with thousands of submissions.
+    # submission even for users with thousands of submissions. Scan at most
+    # max_comments * 5 submitted IDs so a link-heavy user cannot trigger an
+    # unbounded number of requests.
+    scan_ceiling = max_comments * 5
+    examined = 0
     comments: list[str] = []
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         for batch_start in range(0, len(submitted), MAX_WORKERS):
             batch = submitted[batch_start : batch_start + MAX_WORKERS]
             futures = [executor.submit(fetch_item, item_id) for item_id in batch]
             for future in as_completed(futures):
-                item = future.result()
+                examined += 1
+                try:
+                    item = future.result()
+                except requests.RequestException:
+                    # A single failing item must not kill the whole run.
+                    continue
                 if item and item.get("type") == "comment" and item.get("text"):
                     comments.append(item["text"])
-            if len(comments) >= MAX_COMMENTS:
+            if len(comments) >= max_comments or examined >= scan_ceiling:
                 break
-    return comments
+    # A batch always completes, so we may have collected more comments than
+    # requested. Truncate so max_comments is exact.
+    return comments[:max_comments]
 
 
 def analyze_comments(username: str, comments: list[str], question: str, api_key: str, model: str) -> str:
@@ -79,6 +89,8 @@ def main() -> None:
 
     username: str = params["username"]
     question: str = params["question"]
+    max_comments = params.get("max_comments", 600)
+    max_comments = max(1, min(2000, max_comments))
 
     config_path = Path(__file__).parent.parent / "config.json"
     config = json.loads(config_path.read_text())
@@ -89,13 +101,24 @@ def main() -> None:
     response.raise_for_status()
     user_data = response.json()
 
+    # The HN API returns null (not a 404) for a username that does not exist.
+    if not user_data:
+        raise ValueError(f"No such Hacker News user: '{username}'.")
+
     submitted: list[int] = user_data.get("submitted", [])
 
-    comments = fetch_comments(submitted)
+    comments = fetch_comments(submitted, max_comments)
+
+    if not comments:
+        raise ValueError(
+            f"No comments found for Hacker News user '{username}'. "
+            "Either this user has no comments, or the scan ceiling "
+            "(max_comments * 5) was reached before finding any."
+        )
 
     analysis = analyze_comments(username, comments, question, api_key, model)
 
-    json.dump({"analysis": analysis}, sys.stdout)
+    json.dump({"analysis": analysis, "comments_analyzed": len(comments)}, sys.stdout)
 
 
 main()

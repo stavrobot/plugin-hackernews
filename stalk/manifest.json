@@ -11,6 +11,10 @@
     "question": {
       "type": "string",
       "description": "The question to answer about the user based on their comment history."
+    },
+    "max_comments": {
+      "type": "integer",
+      "description": "Maximum number of comments to analyze (1-2000). Defaults to 600."
     }
   }
 }
