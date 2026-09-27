@@ -1,6 +1,7 @@
 {
   "name": "hackernews",
   "description": "Read and submit Hacker News stories, and research HN users.",
+  "summary": "Read and submit Hacker News stories",
   "config": {
     "api_key": {
       "description": "OpenAI API key for LLM-based analysis tools.",
